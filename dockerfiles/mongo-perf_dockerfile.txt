@@ -1,0 +1,20 @@
+FROM debian:latest
+ENV \
+  BUILD_PKG='sudo make automake libtool pkg-config' \
+  PERF_PKG='python-pip python-setuptools python-dev' \
+  KEEP_PKG='curl git libaio-dev vim-common libmysqlclient-dev libpq-dev unzip' \
+  BASE_PKG='ca-certificates apt-transport-https software-properties-common mongodb-clients' \
+RUN DEBIAN_FRONTEND=noninteractive \
+  && apt-get -qq update && apt-get -qqy dist-upgrade \
+  && apt-get -qqy --no-install-recommends install \
+     $BUILD_PKG \
+     $KEEP_PKG \
+     $BASE_PKG \
+  && echo '%sudo ALL=(ALL) NOPASSWD:ALL'>> /etc/sudoers \
+  && cd /usr/local \
+  && git clone --depth 1 https://github.com/mongodb/mongo-perf.git \
+  && cd /usr/local/mongo-perf \
+  && pip install -r requirements.txt \
+WORKDIR /usr/local/mongo-perf/
+COPY assets /assets
+ENTRYPOINT [ "/assets/start" ]

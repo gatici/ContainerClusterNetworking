@@ -1,0 +1,10 @@
+FROM ubuntu:xenial
+MAINTAINER gatici
+#install dependencies
+RUN apt-get update && \
+    apt-get install -y gcc make curl && \
+    apt-get clean && \
+# Download Netperf
+RUN curl -LO ftp://ftp.netperf.org/netperf/netperf-2.7.0.tar.gz && tar -xzf netperf-2.7.0.tar.gz 
+RUN cd netperf-2.7.0 && ./configure && make && make install
+CMD ["/usr/local/bin/netserver", "-D"]  
